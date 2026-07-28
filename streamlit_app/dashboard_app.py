@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from streamlit_folium import st_folium
 
 load_dotenv()
-BACKEND_URL = os.environ.get("BACKEND_URL", "http://localhost:8000")
+BACKEND_URL = os.environ.get("BACKEND_URL") or st.secrets.get("BACKEND_URL", "http://localhost:8000")
 
 st.set_page_config(page_title="CivicBin AI - Municipal Dashboard", layout="wide")
 st.title("CivicBin AI — Municipal Dashboard")
