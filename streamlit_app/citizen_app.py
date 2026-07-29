@@ -45,7 +45,7 @@ def search_india_places(query: str):
 
 
 st.set_page_config(page_title="CivicBin AI - Report a Bin", page_icon="🗑️")
-st.title("🗑️ Report an Overflowing Bin")
+st.title("Report an Overflowing Bin")
 st.write("Snap a photo of the bin and we'll route a collection crew automatically.")
 
 query = st.text_input("Search for your city or town in India", placeholder="e.g. Coimbatore, Salem, Warangal...")
