@@ -38,8 +38,7 @@ app.add_middleware(
 
 
 @app.post("/report")
-async def create_report(lat: float = Form(...), lng: float = Form(...),
-                         photo: UploadFile = File(...)):
+async def create_report(lat: float = Form(...), lng: float = Form(...), city: str = Form(""), photo: UploadFile = File(...)):
     with tempfile.NamedTemporaryFile(suffix=Path(photo.filename).suffix, delete=False) as tmp:
         shutil.copyfileobj(photo.file, tmp)
         tmp_path = tmp.name
@@ -52,6 +51,7 @@ async def create_report(lat: float = Form(...), lng: float = Form(...),
         status=classification["status"],
         confidence=classification["confidence"],
         reasoning=classification["reasoning"],
+        city=city,
     )
     try:
         log_report(

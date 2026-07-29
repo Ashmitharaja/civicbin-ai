@@ -24,12 +24,13 @@ COLLECTION = "bin_reports"
 
 
 def save_report(lat: float, lng: float, status: str, confidence: float,
-                 reasoning: str, photo_url: str | None = None) -> str:
+                 reasoning: str, city: str = "", photo_url: str | None = None) -> str:
     report_id = str(uuid.uuid4())
     db.collection(COLLECTION).document(report_id).set({
         "id": report_id,
         "lat": lat,
         "lng": lng,
+         "city": city,
         "status": status,
         "confidence": confidence,
         "reasoning": reasoning,

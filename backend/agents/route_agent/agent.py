@@ -57,8 +57,15 @@ def get_priority_bins() -> dict:
 
     return {
         "route": [
-            {"id": r["id"], "lat": r["lat"], "lng": r["lng"], "status": r["status"]}
-            for r in route
+            {
+                "stop": i + 1,
+                "id": r["id"],
+                "city": r.get("city") or "(no city set)",
+                "lat": r["lat"],
+                "lng": r["lng"],
+                "status": r["status"],
+            }
+            for i, r in enumerate(route)
         ],
         "stop_count": len(route),
     }
