@@ -1,5 +1,4 @@
 import os
-
 import folium
 import pandas as pd
 import requests
@@ -11,7 +10,7 @@ load_dotenv()
 BACKEND_URL = os.environ.get("BACKEND_URL") or st.secrets.get("BACKEND_URL", "http://localhost:8000")
 
 st.set_page_config(page_title="CivicBin AI - Municipal Dashboard", layout="wide")
-st.title("🏛️ CivicBin AI — Municipal Dashboard")
+st.title("CivicBin AI — Municipal Dashboard")
 
 STATUS_COLOR = {
     "overflowing": "red",
@@ -48,7 +47,7 @@ with col_stats:
         st.info("No active reports.")
 
 st.divider()
-st.subheader("🤖 AI-planned collection route")
+st.subheader("AI-planned collection route")
 st.caption("Each truck is assigned stops based on its current position — nearest available truck gets each bin, like a dispatch system.")
 
 if st.button("Generate route (TriageAgent → RouteAgent via A2A)"):

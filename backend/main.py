@@ -110,9 +110,14 @@ def set_truck_location(truck_id: str, lat: float = Form(...), lng: float = Form(
 
 
 @app.post("/collect/{report_id}")
-def collect_report(report_id: str):
+def collect_report(report_id: str, truck_id: str = Form(...),
+                    lat: float = Form(...), lng: float = Form(...)):
     mark_collected(report_id)
-    return {"status": "collected", "report_id": report_id}
+    # The truck is now physically at the bin it just collected — update its
+    # live position so the next /route call re-sequences from here, not
+    # from where it started the day.
+    update_truck_location(truck_id, lat, lng)
+    return {"status": "collected", "report_id": report_id, "truck_moved_to": {"lat": lat, "lng": lng}}
 
 
 @app.get("/health")

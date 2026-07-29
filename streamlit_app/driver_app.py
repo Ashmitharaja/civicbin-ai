@@ -8,7 +8,7 @@ load_dotenv()
 BACKEND_URL = os.environ.get("BACKEND_URL") or st.secrets.get("BACKEND_URL", "http://localhost:8000")
 
 st.set_page_config(page_title="CivicBin AI - Driver App", page_icon="🚛")
-st.title("🚛 Driver — Today's Stops")
+st.title("Driver — Today's Stops")
 
 tab_stops, tab_register = st.tabs(["My route", "Register a truck"])
 
@@ -44,9 +44,13 @@ with tab_stops:
                         st.write(f"**Stop {s['stop']}: {s['city']}**")
                         st.caption(f"{s['status']} — ({s['lat']}, {s['lng']})")
                         if st.button("Mark collected", key=f"collect_{s['id']}"):
-                            collect_resp = requests.post(f"{BACKEND_URL}/collect/{s['id']}", timeout=15)
+                            collect_resp = requests.post(
+                                f"{BACKEND_URL}/collect/{s['id']}",
+                                data={"truck_id": truck["id"], "lat": s["lat"], "lng": s["lng"]},
+                                timeout=15,
+                            )
                             if collect_resp.ok:
-                                st.success("Marked collected — refresh route to update the list.")
+                                st.success("Marked collected — truck position updated. Refresh route to re-optimize remaining stops.")
                             else:
                                 st.error(f"Could not update: {collect_resp.text}")
         else:
