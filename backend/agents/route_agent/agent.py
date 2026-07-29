@@ -80,25 +80,45 @@ def get_priority_bins() -> dict:
         t["id"]: {
             "name": t.get("name", t["id"]),
             "driver_name": t.get("driver_name"),
-            "pos": (t["lat"], t["lng"]),
+            "start_pos": (t["lat"], t["lng"]),
+            "assign_pos": (t["lat"], t["lng"]),  # moves during assignment for load balancing
             "capacity": t.get("capacity", 8),
             "load": 0,
-            "stops": [],
+            "assigned": [],
         }
         for t in trucks
     }
 
+    # Phase 1 — ASSIGNMENT: decide which truck gets which bin. Each bin goes
+    # to whichever truck is currently closest to it (tracking a moving
+    # "assign_pos" so load balances across trucks instead of dumping
+    # everything on the single nearest one).
     unassigned = []
     for r in reports:
         candidates = [tid for tid, tr in fleet.items() if tr["load"] < tr["capacity"]]
         if not candidates:
             unassigned.append(r)
             continue
-        nearest_id = min(candidates, key=lambda tid: _dist(fleet[tid]["pos"], (r["lat"], r["lng"])))
+        nearest_id = min(candidates, key=lambda tid: _dist(fleet[tid]["assign_pos"], (r["lat"], r["lng"])))
         truck = fleet[nearest_id]
-        truck["stops"].append(r)
-        truck["pos"] = (r["lat"], r["lng"])
+        truck["assigned"].append(r)
+        truck["assign_pos"] = (r["lat"], r["lng"])
         truck["load"] += 1
+
+    # Phase 2 — SEQUENCING: for each truck independently, compute the actual
+    # visiting order via nearest-neighbor starting from where that truck
+    # really is right now. This is what makes the stop order reflect real
+    # travel distance instead of just the order bins were assigned in.
+    for tr in fleet.values():
+        remaining = list(tr["assigned"])
+        ordered = []
+        current = tr["start_pos"]
+        while remaining:
+            nearest = min(remaining, key=lambda r: _dist(current, (r["lat"], r["lng"])))
+            ordered.append(nearest)
+            current = (nearest["lat"], nearest["lng"])
+            remaining.remove(nearest)
+        tr["stops"] = ordered
 
     return {
         "trucks": [
